@@ -1,19 +1,22 @@
 "use client";
 
 import { useForm, SubmitHandler } from "react-hook-form";
-import { TLoginValues } from "@/types/common";
+import { TLoginValues } from "@/types";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLoginMutation } from "@/redux/features/auth/authApi";
 import { toast } from "react-toastify";
 import Cookies from "js-cookie";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/features/auth/authSlice";
-import GoogleLoginButton from "@/components/shared/GoogleLoginButton";
+import { FolderGit2, ArrowRight } from "lucide-react";
+import { Suspense } from "react";
 
-const Login = () => {
+function LoginForm() {
   const [loginUser, { isLoading }] = useLoginMutation();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectPath = searchParams.get("redirect") || "/";
   const dispatch = useAppDispatch();
 
   const {
@@ -22,130 +25,160 @@ const Login = () => {
     formState: { errors },
   } = useForm<TLoginValues>();
 
-  const onSubmit: SubmitHandler<TLoginValues> = async (data) => {
+  const onSubmit: SubmitHandler<TLoginValues> = async (formData) => {
     try {
-      const response: any = await loginUser(data);
-     
+      const response = await loginUser(formData).unwrap();
+      const authData = response.result || response.data;
 
-      if (response.data?.result?.accessToken) {
-        toast.success("Login Successful");
+      if (authData?.accessToken) {
+        toast.success(response.message || "Logged in successfully!");
 
-        router.push("/");
         dispatch(
           setUser({
-            name: response.data.result.fullName,
-            email: response.data.result.email,
-            role: response.data.result.role,
-            token: response.data.result?.accessToken,
+            id: authData.id,
+            name: authData.fullName,
+            email: formData.email,
+            role: authData.role,
+            token: authData.accessToken,
           })
         );
-        Cookies.set("token", response.data?.result?.accessToken);
-      } else if (response.error) {
-        toast.error(response.error.data.message);
+
+        Cookies.set("token", authData.accessToken, { expires: 7 });
+        Cookies.set("accessToken", authData.accessToken, { expires: 7 });
+
+        router.push(redirectPath);
+      } else {
+        toast.error("Failed to authenticate. Please try again.");
       }
-    } catch (error) {
-      console.log(error);
-      toast.error("An unexpected error occurred.");
-    } finally {
+    } catch (err: any) {
+      console.error(err);
+      const errorMessage =
+        err?.data?.message || err?.error || "Invalid credentials";
+      toast.error(errorMessage);
     }
   };
 
   return (
-    <div className="bg-[#f8f8f8] min-h-screen flex items-center justify-center">
-      <div className="w-full md:w-2/5 xl:w-1/3 2xl:w-1/4 shadow-md mx-2 md:mx-auto py-12 px-6 dark:text-white bg-white rounded-[10px]">
-        <div className="flex flex-col items-center">
-          <h1
-            style={{
-              fontFamily: "'Satisfy', cursive",
-            }}          
-            className="flex text-green-600 text-3xl font-bold items-center gap-2"
-          >
-            <span className="tracking-wide">Flowboard</span>
-          </h1>        
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+        <div className="flex justify-center">
+          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
+            <FolderGit2 className="w-6 h-6 text-primary" />
+          </div>
         </div>
+        <h2 className="mt-4 text-center text-2xl font-bold tracking-tight text-gray-900">
+          Sign in to ProjectHub
+        </h2>
+        <p className="mt-1 text-center text-sm text-gray-500">
+          Project Submission & Review Portal
+        </p>
+      </div>
 
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="rounded-[9px] py-6 bg-white"
-        >
-          <div className="mb-4">
-            <label className="label-design pb-1">Email Address</label>
-            <input
-              type="email"
-              {...register("email", {
-                required: "Email is required",
-              })}
-              className="input-design"
-              placeholder="Enter your email"
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm">{errors.email.message}</p>
-            )}
-          </div>
-          <div className="mb-4">
-            <label className="label-design pb-1">Password</label>
-            <input
-              type="password"
-              {...register("password", { required: "Password is required" })}
-              className="input-design"
-              placeholder="Enter password"
-            />
-            {errors.password && (
-              <p className="text-red-500 text-sm">{errors.password.message}</p>
-            )}
-          </div>
-          <div className="flex justify-between items-center py-3">
-            <Link
-              href="/auth/reset-password"
-              className="text-secondary hover:underline"
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
+        <div className="bg-white py-8 px-6 shadow-sm border border-gray-200/80 rounded-2xl sm:px-10">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <div>
+              <label className="label-design">Email Address</label>
+              <input
+                type="email"
+                {...register("email", {
+                  required: "Email is required",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                    message: "Invalid email address",
+                  },
+                })}
+                className="input-design"
+                placeholder="name@example.com"
+                autoComplete="email"
+              />
+              {errors.email && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.email.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="label-design">Password</label>
+              <input
+                type="password"
+                {...register("password", { required: "Password is required" })}
+                className="input-design"
+                placeholder="••••••••"
+                autoComplete="current-password"
+              />
+              {errors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <button
+              disabled={isLoading}
+              type="submit"
+              className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-[8px] shadow-sm text-sm font-semibold text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary disabled:opacity-50 transition-all mt-2"
             >
-              Forgot Password?
-            </Link>
-          </div>
-          <button
-            disabled={isLoading}
-            type="submit"
-            className="text-[#FFF] py-2 font-semibold rounded-[4px] w-full bg-primary"
-          >
-            {isLoading ? (
-              <>
-                <svg
-                  className="animate-spin h-4 w-4 inline mr-2"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  />
-                </svg>
-                Signing in...
-              </>
-            ) : (
-              <>Sign In</>
-            )}
-          </button>
-        </form>
-        <GoogleLoginButton></GoogleLoginButton>
+              {isLoading ? (
+                <>
+                  <svg
+                    className="animate-spin h-4 w-4 inline"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v8H4z"
+                    />
+                  </svg>
+                  <span>Signing in...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign In</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </form>
 
-        <div className="text-center text-gray-700 pt-4">
-          Dont have an account?
-          <Link href="/auth/register" className="text-secondary hover:underline">
-            Register Here
-          </Link>
+          <div className="mt-6 border-t border-gray-100 pt-4 text-center">
+            <p className="text-xs text-gray-600">
+              Don&apos;t have a student account?{" "}
+              <Link
+                href="/auth/register"
+                className="text-primary font-semibold hover:underline"
+              >
+                Register Here
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
-export default Login;
+export default function LoginPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-slate-50">
+          <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <LoginForm />
+    </Suspense>
+  );
+}

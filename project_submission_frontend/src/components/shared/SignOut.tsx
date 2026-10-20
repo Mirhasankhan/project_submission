@@ -1,31 +1,30 @@
-import { setUser } from "@/redux/features/auth/authSlice";
+"use client";
+
+import { logOut } from "@/redux/features/auth/authSlice";
 import { useAppDispatch } from "@/redux/hooks";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { LogOut } from "lucide-react";
 
 const SignOut = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
-  const logOut = () => {
-    dispatch(
-      setUser({
-        name: "",
-        email: "",
-        role: "",
-        token: "",
-      })
-    );
-    Cookies.remove("token");
 
+  const handleSignOut = () => {
+    dispatch(logOut());
+    Cookies.remove("token");
+    Cookies.remove("accessToken");
     router.push("/auth/login");
   };
+
   return (
     <button
-      onClick={() => logOut()}
-      className="bg-transparent border text-red-600 border-red-600 px-3 md:px-5 py-2 rounded-[6px]"
+      onClick={handleSignOut}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium text-rose-600 bg-rose-50 border border-rose-200 rounded-[8px] hover:bg-rose-100 transition-colors"
+      title="Sign Out"
     >
-      
-      Sign Out
+      <LogOut className="w-3.5 h-3.5" />
+      <span>Sign Out</span>
     </button>
   );
 };

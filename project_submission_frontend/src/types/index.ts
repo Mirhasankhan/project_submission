@@ -18,10 +18,12 @@ export interface AuthSuccessData {
 }
 
 export interface ApiResponse<T> {
-  statusCode: number;
+  statusCode?: number;
   success: boolean;
   message: string;
-  data: T;
+  meta?: SubmissionPaginationMeta | null;
+  result?: T;
+  data?: T;
 }
 
 export interface SubmissionStudent {

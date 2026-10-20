@@ -3,12 +3,7 @@
 import { usePathname } from "next/navigation";
 import Header from "../shared/Header";
 
-
-const authRoutes = [
-  "/auth/login",
-  "/auth/register",
-  "/auth/reset-password",
-];
+const authRoutes = ["/auth/login", "/auth/register"];
 
 export default function LayoutWrapper({
   children,
@@ -24,10 +19,7 @@ export default function LayoutWrapper({
   return (
     <>
       {!isAuthRoute && <Header />}
-
-      <div className="min-h-[90vh] bg-white">
-        {children}
-      </div>
+      <div className="min-h-[calc(100vh-65px)] bg-slate-50/50">{children}</div>
     </>
   );
 }

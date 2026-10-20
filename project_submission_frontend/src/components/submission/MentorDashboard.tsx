@@ -10,8 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Search,
   Github,
-  ExternalLink,
-  Calendar,
+  ExternalLink, 
   AlertCircle,
   Inbox,
   ChevronLeft,
@@ -19,8 +18,7 @@ import {
   Filter,
   CheckCircle2,
   XCircle,
-  User,
-  ShieldAlert,
+  User, 
 } from "lucide-react";
 import dayjs from "dayjs";
 

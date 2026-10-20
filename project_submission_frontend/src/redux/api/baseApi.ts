@@ -1,25 +1,27 @@
-import { JWTDecode } from "@/utils/jwt";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import Cookies from "js-cookie";
+import { RootState } from "../store";
 
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.NEXT_PUBLIC_BASE_URL, 
-   
-    prepareHeaders: (headers) => {
-      const { token } = JWTDecode();
+    baseUrl: process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:4097/api/v1",
+    prepareHeaders: (headers, { getState }) => {
+      const stateToken = (getState() as RootState)?.auth?.token;
+      const cookieToken =
+        typeof window !== "undefined"
+          ? Cookies.get("token") || Cookies.get("accessToken")
+          : null;
 
-      headers.set("Authorization", `Bearer ${token as string}`);
+      const token = stateToken || cookieToken;
 
-      // if (token) {
-      //   headers.set("Authorization", `${token}`);
-      // }
+      if (token) {
+        headers.set("Authorization", `Bearer ${token}`);
+      }
+
       return headers;
     },
   }),
-  tagTypes: [
-    "users",   
-    "boards",
-  ],
+  tagTypes: ["Auth", "Submissions"],
   endpoints: () => ({}),
 });

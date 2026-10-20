@@ -1,36 +1,49 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "../../store";
+import { UserRole } from "@/types";
 
-type TAuthState = {
-  name: null | string;
-  email: null | string;
-  role: null | boolean;
-  token: null | string;
-};
+export interface AuthState {
+  id: string | null;
+  name: string | null;
+  email: string | null;
+  role: UserRole | null;
+  token: string | null;
+}
 
-const initialState: TAuthState = {
+const initialState: AuthState = {
+  id: null,
   name: null,
   email: null,
   role: null,
   token: null,
 };
 
+export interface SetUserPayload {
+  id?: string | null;
+  name?: string | null;
+  email?: string | null;
+  role?: UserRole | null;
+  token?: string | null;
+}
+
 const authSlice = createSlice({
   name: "auth",
-  initialState: initialState,
+  initialState,
   reducers: {
-    setUser: (state, action) => {
-      const { name, email, token, role } = action.payload;
-      state.name = name;
-      state.email = email;
-      state.role = role;
-      state.token = token;
+    setUser: (state, action: PayloadAction<SetUserPayload>) => {
+      const { id, name, email, role, token } = action.payload;
+      if (id !== undefined) state.id = id;
+      if (name !== undefined) state.name = name;
+      if (email !== undefined) state.email = email;
+      if (role !== undefined) state.role = role;
+      if (token !== undefined) state.token = token;
     },
     logOut: (state) => {
-      state.email = null;
-      state.token = null;
-      state.role = null;
+      state.id = null;
       state.name = null;
+      state.email = null;
+      state.role = null;
+      state.token = null;
     },
   },
 });

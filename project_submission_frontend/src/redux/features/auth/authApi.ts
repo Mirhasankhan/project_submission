@@ -1,95 +1,41 @@
 import { baseApi } from "../../api/baseApi";
+import {
+  ApiResponse,
+  AuthSuccessData,
+  TLoginValues,
+  TRegisterValues,
+  UserProfile,
+} from "@/types";
 
 const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
-    registerRequest: builder.mutation({
-      query: (userInfo) => ({
-        url: "/user/create-pending",
-        method: "POST",
-        body: userInfo,
-      }),
-    }),
-    verifyEmail: builder.mutation({
-      query: (data) => ({
-        url: "/user/verify-email",
-        method: "POST",
-        body: data,
-      }),
-    }),
-    resendOtp: builder.mutation({
-      query: (email) => ({
-        url: "/user/resend-otp",
-        method: "POST",
-        body: email,
-      }),
-    }),
-    login: builder.mutation({
-      query: (userInfo) => ({
+    login: builder.mutation<ApiResponse<AuthSuccessData>, TLoginValues>({
+      query: (credentials) => ({
         url: "/auth/login",
         method: "POST",
-        body: userInfo,
+        body: credentials,
       }),
-      invalidatesTags: ["users"],
-    }),
-    googleLogin: builder.mutation({
-      query: (userInfo) => ({
-        url: "/auth/google-login",
-        method: "POST",
-        body: userInfo,
-      }),
-    }),
-    profile: builder.query({
-      query: () => ({
-        url: "/user/my-profile",
-        method: "GET",
-      }),
-      providesTags: ["users"],
-    }),
-    sendOtp: builder.mutation({
-      query: (email) => ({
-        url: "/auth/send-otp",
-        method: "POST",
-        body: email,
-      }),
-    }),
-    verifyOtp: builder.mutation({
-      query: ({ email, otp }) => ({
-        url: "/auth/verify-otp",
-        method: "POST",
-        body: { email, otp },
-      }),
-    }),
-    resetPassword: builder.mutation({
-      query: (data) => ({
-        url: "/auth/reset-password",
-        method: "PATCH",
-        body: data,
-        headers: {
-          Authorization: data.token,
-        },
-      }),
+      invalidatesTags: ["Auth"],
     }),
 
-    updateProfile: builder.mutation({
-      query: (data) => ({
-        url: "/user/profile-update",
-        method: "PUT",
-        body: data,
+    register: builder.mutation<ApiResponse<AuthSuccessData>, TRegisterValues>({
+      query: (userData) => ({
+        url: "/auth/register",
+        method: "POST",
+        body: userData,
       }),
-      invalidatesTags: ["users"],
+      invalidatesTags: ["Auth"],
+    }),
+
+    profile: builder.query<ApiResponse<UserProfile>, void>({
+      query: () => ({
+        url: "/auth/profile",
+        method: "GET",
+      }),
+      providesTags: ["Auth"],
     }),
   }),
 });
 
-export const {
-  useSendOtpMutation,
-  useRegisterRequestMutation,
-  useVerifyEmailMutation,
-  useResendOtpMutation,
-  useProfileQuery,
-  useLoginMutation,
-  useUpdateProfileMutation,
-  useGoogleLoginMutation,
-  useVerifyOtpMutation,
-  useResetPasswordMutation,
-} = authApi;
+export const { useLoginMutation, useRegisterMutation, useProfileQuery } =
+  authApi;

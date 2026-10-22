@@ -40,6 +40,4 @@ router.patch(
   submissionController.approveRejectSubmission,
 );
 
-
-
 export const submissionRoute = router;

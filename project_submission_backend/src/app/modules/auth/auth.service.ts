@@ -16,7 +16,7 @@ const registerStudentIntoDB = async (payload: IRegisterPayload) => {
   });
 
   if (existingUser) {
-    throw new ApiError(409, "User already exists");
+    throw new ApiError(409, "User already exists, please login instead");
   }
 
   const hashedPassword = await bcrypt.hash(payload.password as string, 10);
@@ -86,7 +86,7 @@ const loginUserIntoDB = async (payload: ILoginPayload) => {
   );
 
   return {
-    message: "User logged in successfully",
+    message: "Logged in successfully",
     data: {
       accessToken,
       id: user.id,
@@ -109,7 +109,7 @@ const getProfileFromDB = async (id: string) => {
   });
 
   return {
-    message: "User profile fetched successfully",
+    message: "Profile fetched successfully",
     data: user,
   };
 };

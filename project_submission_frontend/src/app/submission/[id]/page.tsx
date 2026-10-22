@@ -1,6 +1,7 @@
-import { cookies } from "next/headers";
+"use client";
+
+import { useParams } from "next/navigation";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import Container from "@/utils/Container";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -15,66 +16,18 @@ import {
   XCircle,
 } from "lucide-react";
 import dayjs from "dayjs";
-import type { Metadata } from "next";
 import { SubmissionItem } from "@/types";
+import { useGetSubmissionQuery } from "@/redux/features/submission/submissionApi";
 
-interface PageProps {
-  params: Promise<{ id: string }>;
-}
+export default function SubmissionDetailPage() {
+  const { id } = useParams<{ id: string }>();
+  const { data: response, isLoading } = useGetSubmissionQuery(id);
+  const submission: SubmissionItem | null =
+    response?.result || response?.data || null;
 
-async function getSubmission(id: string, token: string): Promise<SubmissionItem | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:4097/api/v1";
-
-  try {
-    const res = await fetch(`${baseUrl}/submission/${id}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store", // SSR dynamic
-    });
-
-    if (!res.ok) {
-      return null;
-    }
-
-    const json = await res.json();
-    return json.result || json.data || null;
-  } catch (error) {
-    console.error("Error fetching submission details:", error);
+  if (isLoading) {
     return null;
   }
-}
-
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const { id } = await params;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value || cookieStore.get("accessToken")?.value;
-
-  if (!token) {
-    return { title: "Submission Details | ProjectHub" };
-  }
-
-  const submission = await getSubmission(id, token);
-
-  if (!submission) {
-    return { title: "Submission | ProjectHub" };
-  }
-
-  return {
-    title: `${submission.projectName} - Review | ProjectHub`,
-    description: submission.description?.slice(0, 160) || "Project submission details",
-  };
-}
-
-export default async function SubmissionDetailPage({ params }: PageProps) {
-  const { id } = await params;
-  const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value || cookieStore.get("accessToken")?.value;
-
-  if (!token) {
-    redirect(`/auth/login?redirect=/submission/${id}`);
-  }
-
-  const submission = await getSubmission(id, token);
-
   // If the submission is not found or not accessible
   if (!submission) {
     return (

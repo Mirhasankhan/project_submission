@@ -1,144 +1,193 @@
-# Frontend form field specs — Warehouse, Warehouse Location, Product
+# Frontend Form Field Specs & Backend Integration Notes
 
-Three separate forms, matching the three create endpoints in the service code. Fields pulled directly from the Prisma schema + what `createNewWarehouseInDB` / `createWarehouseLocationInDB` / `createProductIntoDB` actually consume. System fields (`id`, `createdAt`, `updatedAt`) and computed fields (`avgRating`, `totalReviews`) are excluded — they're never user-entered.
-
----
-
-## 1. Warehouse form
-
-| Field | Type | Required | Input | Notes |
-|---|---|---|---|---|
-| `managerId` | ObjectId | Yes | Select (Admin, filtered to `adminRole = Warehouse_Manager`) | Backend rejects any other admin role with 404 |
-| `warehouseName` | string | Yes | Text | Display name |
-| `warehouseId` | string | Yes | Text | Human-readable warehouse code (separate from Mongo `_id`) |
-| `type` | string | Yes | Text or select | Free text in schema — pick a fixed list if you want consistency (e.g. "Distribution", "Cold storage") |
-| `storageType` | string | Yes | Text or select | Same — no enum enforced server-side |
-| `address` | string | Yes | Text | |
-| `city` | string | Yes | Text | |
-| `country` | string | Yes | Text or country select | |
-| `postCode` | string | Yes | Text | |
-| `contactNumber` | string | Yes | Tel | |
-| `openingTime` | string | Yes | Time picker | Stored as string, not `DateTime` |
-| `closingTime` | string | Yes | Time picker | Stored as string |
-| `operatingDays` | string[] | Yes | Multi-select checkboxes (Mon–Sun) | |
-
-**Capacity section — repeatable array, at least one row recommended:**
-
-| Field | Type | Required | Input | Notes |
-|---|---|---|---|---|
-| `totalZones` | int | Yes | Number | |
-| `totalCapacity` | int | Yes | Number | Raw unit count — see the unit-type note below |
-| `unitType` | enum | Yes | Select (currently only `Unit`) | `TUnitType` has a single member today — this field can be a fixed/disabled dropdown for now |
+This document specifies the form field requirements, validation rules, backend data consumption, and business constraints for all user-facing forms in the **Project Submission Portal**. System-managed fields (`id`, `createdAt`, `updatedAt`, `normalizedRepo`, `studentId`) are automatically handled by the backend.
 
 ---
 
-## 2. Warehouse location form
+## 1. Student Registration Form
 
-| Field | Type | Required | Input | Notes |
+- **Endpoint:** `POST /api/v1/auth/register`
+- **Access:** Public
+- **Rate Limit:** 3 requests per 1-minute window
+- **Target Role:** Registers users with role `Student`
+
+| Field | Type | Required | Input / Widget | Validation & Notes |
 |---|---|---|---|---|
-| `warehouseId` | ObjectId | Yes | Select (Warehouse) | Locks the scope for the rest of the form |
-| `name` | string | Yes | Text | Display name, e.g. "Zone A" |
-| `code` | string | Yes | Text | Must be unique **within the selected warehouse** — validate/show error on duplicate |
-| `type` | enum | Yes | Select | `ZONE`, `RACK`, `SHELF`, `BIN`, `PALLET_POSITION`, `BULK` |
-| `parentId` | ObjectId | No | Select (existing locations, filtered to same `warehouseId`) | Backend rejects a parent from a different warehouse |
-| `capacity` | int | No | Number | Optional per-location capacity limit |
-| `capacityUnit` | enum | No | Select (currently only `Unit`) | Same one-member enum caveat as above |
-| `status` | enum | No (defaults `ACTIVE`) | Select | `ACTIVE`, `INACTIVE`, `MAINTENANCE`, `FULL` |
+| `fullName` | string | **Yes** | Text input | Minimum 1 character. Trims whitespace. |
+| `email` | string | **Yes** | Email input | Must be a valid email format. Backend checks uniqueness (returns `409 Conflict: User already exists, please login instead`). |
+| `password` | string | **Yes** | Password input | Minimum 6 characters. Hashed server-side with `bcrypt` (10 rounds). |
 
-**UX tip:** since `parentId` must belong to the same warehouse, populate that dropdown dynamically after `warehouseId` is chosen, and re-filter if the user changes the warehouse.
+**Backend Response Payload:**
+```json
+{
+  "statusCode": 201,
+  "success": true,
+  "message": "Registered successfully",
+  "data": {
+    "accessToken": "eyJhbGciOi...",
+    "id": "uuid-v4-string",
+    "role": "Student",
+    "fullName": "Student Name"
+  }
+}
+```
 
 ---
 
-## 3. Product form
+## 2. User Login Form
 
-### Basic info
+- **Endpoint:** `POST /api/v1/auth/login`
+- **Access:** Public
+- **Rate Limit:** 3 requests per 1-minute window
+- **Target Roles:** Both `Student` and `Mentor`
 
-| Field | Type | Required | Input | Notes |
+| Field | Type | Required | Input / Widget | Validation & Notes |
 |---|---|---|---|---|
-| `name` | string | Yes | Text | |
-| `shortDescription` | string | No | Text | |
-| `categoryId` | ObjectId | Yes | Select (Category) | |
-| `subcategoryId` | ObjectId | Yes | Select (SubCategory) | Must belong to chosen `categoryId` — backend checks this pair |
-| `sku` | string | Yes | Text | Must be globally unique |
-| `manufacturer` | string | No | Text | |
-| `countryOfOrigin` | string | No | Text or country select | |
+| `email` | string | **Yes** | Email input | Valid email format. Backend returns `404 Not Found: Invalid credentials` if user does not exist. |
+| `password` | string | **Yes** | Password input | Backend returns `403 Forbidden: Invalid credentials` if password does not match bcrypt hash. |
 
-### Specifications
-
-| Field | Type | Required | Input | Notes |
-|---|---|---|---|---|
-| `netWeight` | string | No | Text | Free text, e.g. "500g" — not used in any calculation |
-| `baseUnit` | enum | No (defaults `Unit`) | Select (currently only `Unit`) | Placeholder field, see unit-type caveat |
-| `packagingType` | string | No | Text | Cosmetic only |
-| `containerType` | string | No | Text | Cosmetic only |
-| `shelfLifeFrozen` | string | No | Text | |
-| `storageTemperature` | string | No | Text | |
-| `defrostMethod` | string | No | Text | |
-| `halalCertified` | boolean | No (defaults `false`) | Checkbox | |
-
-### Media
-
-| Field | Type | Required | Input | Notes |
-|---|---|---|---|---|
-| `images` | file[] | **Yes, at least 1** | File upload (multipart) | Backend throws 400 if none uploaded |
-| `certificates` | file[] | No | File upload (multipart) | |
-
-### Extra content
-
-| Field | Type | Required | Input | Notes |
-|---|---|---|---|---|
-| `detailsDescription` | string | No | Rich text / textarea | |
-| `cookingInstructions` | string | No | Rich text / textarea | |
-
-### Settings & visibility
-
-| Field | Type | Required | Input | Notes |
-|---|---|---|---|---|
-| `status` | enum | No (defaults `INACTIVE`) | Select | `ACTIVE`, `INACTIVE` |
-| `isSeasonal` | boolean | No (defaults `false`) | Checkbox | |
-| `isFeatured` | boolean | No (defaults `false`) | Checkbox | |
-| `allowB2C` | boolean | No (defaults `true`) | Checkbox | |
-| `allowB2B` | boolean | No (defaults `true`) | Checkbox | |
-| `retailPrice` | float | No | Number | B2C price; separate from tiered B2B pricing below |
-
-### Pricing tiers — repeatable, **at least one row required**
-
-| Field | Type | Required | Input | Notes |
-|---|---|---|---|---|
-| `tierName` | string | Yes | Text | e.g. "Tier 1" |
-| `minQty` | int | Yes | Number | |
-| `maxQty` | int | No | Number | Open-ended if blank |
-| `pricePerUnit` | float | Yes | Number | |
-| `status` | enum | No (defaults `ACTIVE`) | Select | `ACTIVE`, `INACTIVE` |
-
-### Storage locations — repeatable, **at least one row required**
-
-| Field | Type | Required | Input | Notes |
-|---|---|---|---|---|
-| `warehouseId` / `warehouse` | string | Yes | Select (Warehouse) — accepts ObjectId, warehouse code, or warehouse name | Backend tries all three lookups |
-| `locationId` | ObjectId | No | Select (WarehouseLocation, filtered to chosen warehouse) | |
-| `locationCode` | string | No | Text (fallback if `locationId` not picked) | Used to look up the location if ID isn't given |
-| `binShelf` | string | No | Text | Free-text sub-label |
-| `quantity` | int | Yes | Number | Checked against both warehouse-level and location-level capacity |
-| `batches` | array | No | Repeatable sub-rows | |
-| &nbsp;&nbsp;`batchLotNumber` | string | No | Text | |
-| &nbsp;&nbsp;`expiryDate` | date | No | Date picker | |
-| &nbsp;&nbsp;`manufacturingDate` | date | No | Date picker | |
-
-### Inventory overrides — optional / "advanced" section
-
-The backend auto-calculates these from the storage-location quantities if omitted, so this section can be collapsed/hidden by default:
-
-| Field | Type | Required | Input | Notes |
-|---|---|---|---|---|
-| `totalStockQty` | int | No | Number | Defaults to sum of storage-location quantities |
-| `reservedQty` | int | No | Number | Defaults to `0` |
-| `availableQty` | int | No | Number | Defaults to `totalStockQty - reservedQty` |
-| `minStockLevel` | int | No | Number | Defaults to `0`; drives `stockStatus` (in/low/out of stock) |
+**Backend Response Payload:**
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "User logged in successfully",
+  "data": {
+    "accessToken": "eyJhbGciOi...",
+    "id": "uuid-v4-string",
+    "role": "Student | Mentor",
+    "fullName": "User Name"
+  }
+}
+```
 
 ---
 
-## Cross-form dependencies to wire up in the UI
+## 3. Project Submission Form
 
-- **Warehouse Location form**: `warehouseId` must be picked before `parentId` options load (parent list = locations in that warehouse only).
-- **Product form**: `subcategoryId` options load after `categoryId` is picked. Each row in "Storage locations" should let the user pick a warehouse, then dynamically load that warehouse's locations for `locationId`/`locationCode`. Consider a live capacity indicator (used vs. total) per warehouse/location as the user adds quantities, since the backend will reject over-capacity submissions only at save time.
+- **Endpoint:** `POST /api/v1/submission`
+- **Access:** `Student` role required (`Authorization: Bearer <accessToken>`)
+- **Rate Limit:** 3 requests per 1-minute window
+
+| Field | Type | Required | Input / Widget | Validation & Notes |
+|---|---|---|---|---|
+| `projectName` | string | **Yes** | Text input | 1 to 50 characters. Must be unique per student (returns `409 Conflict` if the student already submitted a project with this name). |
+| `repositoryUrl` | string | **Yes** | URL input | Valid GitHub URL (e.g., `https://github.com/owner/repo`). Max 100 characters. Backend normalizes this URL and enforces uniqueness per student. |
+| `liveUrl` | string | **Yes** | URL input | Valid URL starting with `http://` or `https://`. Max 100 characters. |
+| `description` | string | **Yes** | Textarea | 1 to 1000 characters. Project summary, architecture, and technology stack. |
+
+### Backend Normalization & Duplicate Prevention Logic:
+- **Repository Normalization:** The backend trims trailing slashes, strips `.git` suffixes (case-insensitive), and converts the repository URL to lowercase (`normalizedRepo`).
+- **Uniqueness Check:** The backend executes a compound query:
+  ```typescript
+  prisma.submission.findFirst({
+    where: {
+      studentId,
+      OR: [{ projectName: payload.projectName.trim() }, { normalizedRepo }],
+    },
+  });
+  ```
+- **Rejection on Duplicate:** If a match is found, backend returns:
+  `409 Conflict: A submission with this project name or repository already exists`.
+- **Default Status:** New submissions automatically start in status `Pending`.
+
+---
+
+## 4. Mentor Review Form (Approve / Reject Modal)
+
+- **Endpoint:** `PATCH /api/v1/submission/update-status`
+- **Access:** `Mentor` role required (`Authorization: Bearer <accessToken>`)
+- **Rate Limit:** 3 requests per 1-minute window
+
+| Field | Type | Required | Input / Widget | Validation & Notes |
+|---|---|---|---|---|
+| `submissionId` | string (UUID) | **Yes** | Hidden input / parameter | Must be a valid UUID. The submission must currently be in `Pending` status. |
+| `isApproved` | boolean | **Yes** | Action button toggle | `true` for approval, `false` for rejection. |
+| `rejectReason` | string | **Conditional** | Textarea | **Required when `isApproved` is `false`**. Optional when `isApproved` is `true`. Stored as `rejectionReason` in the database. |
+
+### Business Rules & Constraints:
+1. **Mandatory Reason on Rejection:** If `isApproved === false` and `rejectReason` is missing or empty, the backend returns:
+   `400 Bad Request: Reject reason is required when rejecting a submission`.
+2. **One-Time Review Protection:** The backend only permits updating submissions where `status === "Pending"`. If already processed, it returns:
+   `404 Not Found: Submission not found or already processed`.
+3. **Timestamping:** Setting approval or rejection updates `reviewedAt = new Date()`.
+4. **Reason Cleanup:** Approving a submission sets `rejectionReason = null`.
+
+---
+
+## 5. Submission Query, Filter & Pagination Specs
+
+- **Student Endpoint:** `GET /api/v1/submission/mine`
+- **Mentor Endpoint:** `GET /api/v1/submission/all`
+- **Access:** Student token for `/mine`, Mentor token for `/all`
+
+### Query Parameters
+
+| Parameter | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `search` | string | No | `undefined` | Case-insensitive search matching against `projectName` or `description`. |
+| `status` | enum | No | `undefined` | Filter by exact status: `Pending`, `Approved`, or `Rejected`. |
+| `page` | number | No | `1` | Page number (integer $\ge 1$). |
+| `limit` | number | No | `10` | Items per page (integer between `1` and `100`). |
+
+### Response Schema & Aggregated Metrics
+
+Both endpoints return data wrapped in the standard response envelope:
+
+```json
+{
+  "statusCode": 200,
+  "success": true,
+  "message": "Submissions retrieved successfully",
+  "data": {
+    "submissions": [
+      {
+        "id": "uuid",
+        "projectName": "E-Commerce App",
+        "repositoryUrl": "https://github.com/user/ecommerce",
+        "liveUrl": "https://ecommerce.vercel.app",
+        "description": "Full-stack store built with Next.js and Prisma.",
+        "status": "Pending",
+        "reviewedAt": null,
+        "rejectionReason": null,
+        "createdAt": "2026-10-22T04:20:00.000Z",
+        "student": {
+          "id": "uuid",
+          "fullName": "Student Name",
+          "email": "student@example.com"
+        }
+      }
+    ],
+    "meta": {
+      "page": 1,
+      "limit": 10,
+      "totalCount": 24,
+      "totalPage": 3,
+      "totalPending": 12,
+      "totalApproved": 9,
+      "totalRejected": 3
+    }
+  }
+}
+```
+
+> **Note:**
+> - `student` object is populated on mentor requests (`/submission/all`), omitted on student requests (`/submission/mine`).
+> - The status counts (`totalPending`, `totalApproved`, `totalRejected`) in `meta` provide instant counters for dashboard stat cards without requiring additional requests.
+
+---
+
+## 6. Cross-Form & UI Dependencies
+
+- **Role Routing:**
+  - After login, inspect `data.role`.
+  - `role === "Mentor"` -> Render `MentorDashboard` (`/api/v1/submission/all`).
+  - `role === "Student"` -> Render `StudentDashboard` (`/api/v1/submission/mine`).
+- **Debounced Search:**
+  - The search input on both dashboards uses a 350ms debounce before dispatching the query to prevent redundant API calls.
+- **Cache Invalidation:**
+  - Submitting a project invalidates the `Submissions` tag in RTK Query, instantly refreshing `getMySubmissions`.
+  - Approving or rejecting a project invalidates the `Submissions` tag, instantly updating `getAllSubmissions`.
+- **Error Handling:**
+  - Form validation errors are shown inline beneath each field using `errors.<fieldName>.message`.
+  - Server errors (e.g., duplicate repo, 429 rate limit exceeded, 403 invalid credentials) are caught and displayed via toast notifications.

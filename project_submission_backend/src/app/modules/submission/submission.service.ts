@@ -29,12 +29,12 @@ const submitNewProject = async (
     },
   });
 
-  if (existingSubmission) {
-    throw new ApiError(
-      httpStatus.CONFLICT,
-      "A submission with this project name or repository already exists",
-    );
-  }
+  // if (existingSubmission) {
+  //   throw new ApiError(
+  //     httpStatus.CONFLICT,
+  //     "A submission with this project name or repository already exists",
+  //   );
+  // }
 
   await prisma.submission.create({
     data: {
@@ -200,6 +200,10 @@ const approveRejectSubmission = async (payload: ApproveRejectPayload) => {
       " successfully",
   };
 };
+
+
+
+
 
 export const submissionService = {
   submitNewProject,

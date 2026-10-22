@@ -1,65 +1,31 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Container from "@/utils/Container";
 import StudentDashboard from "@/components/submission/StudentDashboard";
 import MentorDashboard from "@/components/submission/MentorDashboard";
-import type { Metadata } from "next";
+import { useProfileQuery } from "@/redux/features/auth/authApi";
 
-export const metadata: Metadata = {
-  title: "Dashboard | ProjectHub",
-  description: "View and manage academic project submissions and mentor evaluations.",
-};
+export default function HomePage() {
+  const router = useRouter();
+  const { data: profileResponse, isLoading, isError } = useProfileQuery();
+  const user = profileResponse?.result || profileResponse?.data;
 
-export const dynamic = "force-dynamic";
-
-async function getUserProfile(token: string) {
-  const baseUrl =
-    process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:4097/api/v1";
-
-  try {
-    const res = await fetch(`${baseUrl}/auth/profile`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      cache: "no-store",
-    });
-
-    if (!res.ok) {
-      return null;
+  useEffect(() => {
+    if (!isLoading && (isError || !user)) {
+      router.replace("/auth/login");
     }
+  }, [isError, isLoading, router, user]);
 
-    const data = await res.json();
-    return data.result || data.data;
-  } catch (error) {
-    console.error("SSR profile fetch error:", error);
+  if (isLoading || !user) {
     return null;
-  }
-}
-
-export default async function HomePage() {
-  const cookieStore = await cookies();
-  const token =
-    cookieStore.get("token")?.value || cookieStore.get("accessToken")?.value;
-
-  if (!token) {
-    redirect("/auth/login");
-  }
-
-  const user = await getUserProfile(token);
-
-  // If token is invalid or expired, redirect to login
-  if (!user) {
-    redirect("/auth/login");
   }
 
   return (
     <main className="min-h-screen py-8 bg-slate-50/50">
       <Container>
-        {user?.role === "Mentor" ? (
-          <MentorDashboard />
-        ) : (
-          <StudentDashboard />
-        )}
+        {user.role === "Mentor" ? <MentorDashboard /> : <StudentDashboard />}
       </Container>
     </main>
   );

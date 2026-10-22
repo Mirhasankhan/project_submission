@@ -24,7 +24,7 @@ export default function RegisterForm() {
   const onSubmit: SubmitHandler<TRegisterValues> = async (formData) => {
     try {
       const response = await registerUser(formData).unwrap();
-      const authData = response.result || response.data;
+      const authData = response.result;
 
       if (authData?.accessToken) {
         toast.success(response.message || "Account created successfully!");
@@ -69,7 +69,7 @@ export default function RegisterForm() {
               },
             })}
             className="input-design"
-            placeholder="John Doe"
+            placeholder="Enter your full name"
           />
           {errors.fullName && (
             <p className="text-red-500 text-xs mt-1">
@@ -90,7 +90,7 @@ export default function RegisterForm() {
               },
             })}
             className="input-design"
-            placeholder="student@example.com"
+            placeholder="Enter your email address"
             autoComplete="email"
           />
           {errors.email && (
@@ -112,7 +112,7 @@ export default function RegisterForm() {
               },
             })}
             className="input-design"
-            placeholder="Minimum 6 characters"
+            placeholder="Enter your password"
             autoComplete="new-password"
           />
           {errors.password && (

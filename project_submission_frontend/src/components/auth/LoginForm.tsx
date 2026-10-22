@@ -28,7 +28,7 @@ function LoginFormInner() {
   const onSubmit: SubmitHandler<TLoginValues> = async (formData) => {
     try {
       const response = await loginUser(formData).unwrap();
-      const authData = response.result || response.data;
+      const authData = response.result;
 
       if (authData?.accessToken) {
         toast.success(response.message || "Logged in successfully!");

@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import { useApproveRejectSubmissionMutation } from "@/redux/features/submission/submissionApi";
 import { SubmissionItem } from "@/types";
 import { toast } from "react-toastify";
-import { CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
 
 interface ApproveRejectModalProps {
   submission: SubmissionItem | null;
@@ -26,6 +25,7 @@ export default function ApproveRejectModal({
   onClose,
 }: ApproveRejectModalProps) {
   const [rejectReason, setRejectReason] = useState("");
+  const [rejectReasonError, setRejectReasonError] = useState("");
   const [approveRejectSubmission, { isLoading }] =
     useApproveRejectSubmissionMutation();
 
@@ -35,9 +35,11 @@ export default function ApproveRejectModal({
 
   const handleAction = async () => {
     if (!isApprove && !rejectReason.trim()) {
-      toast.error("Please provide a reason for rejecting this submission.");
+      setRejectReasonError("This field is required.");
       return;
     }
+
+    setRejectReasonError("");
 
     try {
       const response = await approveRejectSubmission({
@@ -65,11 +67,6 @@ export default function ApproveRejectModal({
       <DialogContent className="sm:max-w-[480px] p-6">
         <DialogHeader>
           <div className="flex items-center gap-2">
-            {isApprove ? (
-              <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-            ) : (
-              <XCircle className="w-5 h-5 text-rose-600" />
-            )}
             <DialogTitle className="text-xl">
               {isApprove ? "Approve Submission" : "Reject Submission"}
             </DialogTitle>
@@ -91,21 +88,30 @@ export default function ApproveRejectModal({
             <textarea
               rows={4}
               value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              className="input-design resize-y min-h-[100px]"
+              onChange={(e) => {
+                setRejectReason(e.target.value);
+                if (e.target.value.trim()) setRejectReasonError("");
+              }}
+              aria-invalid={Boolean(rejectReasonError)}
+              aria-describedby={
+                rejectReasonError ? "rejection-reason-error" : undefined
+              }
+              className={`input-design resize-y min-h-[100px] ${
+                rejectReasonError ? "border-rose-500 focus:border-rose-500" : ""
+              }`}
               placeholder="Explain the required fixes, broken links, code quality issues, or missing criteria..."
             />
+            {rejectReasonError && (
+              <p
+                id="rejection-reason-error"
+                className="text-xs text-rose-600"
+              >
+                {rejectReasonError}
+              </p>
+            )}
           </div>
         )}
 
-        {isApprove && (
-          <div className="bg-emerald-50 border border-emerald-100 rounded-lg p-3 text-xs text-emerald-800 flex items-start gap-2">
-            <AlertTriangle className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-            <span>
-              Approving marks this milestone as successfully completed by the student.
-            </span>
-          </div>
-        )}
 
         <div className="flex justify-end gap-2 pt-3">
           <Button

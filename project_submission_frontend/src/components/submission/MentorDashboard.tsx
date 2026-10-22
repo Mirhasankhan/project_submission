@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import {
   Search,
   Github,
-  ExternalLink, 
+  ExternalLink,
   AlertCircle,
   Inbox,
   ChevronLeft,
@@ -18,7 +18,7 @@ import {
   Filter,
   CheckCircle2,
   XCircle,
-  User, 
+  User,
 } from "lucide-react";
 import dayjs from "dayjs";
 
@@ -26,7 +26,7 @@ export default function MentorDashboard() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<SubmissionStatus | "ALL">(
-    "ALL"
+    "ALL",
   );
   const [page, setPage] = useState(1);
   const limit = 10;
@@ -35,7 +35,7 @@ export default function MentorDashboard() {
   const [selectedSubmission, setSelectedSubmission] =
     useState<SubmissionItem | null>(null);
   const [reviewMode, setReviewMode] = useState<"approve" | "reject" | null>(
-    null
+    null,
   );
 
   const handleSearchChange = (value: string) => {
@@ -54,8 +54,11 @@ export default function MentorDashboard() {
     limit,
   };
 
-  const { data: response, isLoading, isFetching } =
-    useGetAllSubmissionsQuery(queryParams);
+  const {
+    data: response,
+    isLoading,
+    isFetching,
+  } = useGetAllSubmissionsQuery(queryParams);
 
   const submissionData = response?.result || response?.data;
   const submissions: SubmissionItem[] = submissionData?.submissions || [];
@@ -95,58 +98,55 @@ export default function MentorDashboard() {
             </Badge>
           </div>
           <p className="text-sm text-slate-500">
-            Review student submissions, evaluate code repositories, and provide constructive feedback.
+            Review student submissions, evaluate code repositories, and provide
+            constructive feedback.
           </p>
         </div>
       </div>
 
       {/* Stats Overview */}
-      <StatsCards
-        meta={meta}
-        activeStatus={statusFilter}
-        onStatusSelect={handleStatusSelect}
-      />
+      <StatsCards meta={meta} onStatusSelect={handleStatusSelect} />
 
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
         {/* Search Input using .input-design */}
         <div className="relative flex-1 max-w-md">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             value={search}
             onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="Search by project name or description..."
-            className="input-design pl-9"
+            className="input-design !pl-10"
           />
         </div>
 
-        {/* Status Filter Tabs */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 md:pb-0">
-          <Filter className="w-4 h-4 text-slate-400 mr-1 hidden sm:inline" />
-          {(["ALL", "Pending", "Approved", "Rejected"] as const).map(
-            (status) => (
-              <button
-                key={status}
-                type="button"
-                onClick={() => handleStatusSelect(status)}
-                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap ${
-                  statusFilter === status
-                    ? "bg-primary text-white shadow-sm"
-                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
-                }`}
-              >
-                {status === "ALL" ? "All Submissions" : status}
-              </button>
-            )
-          )}
+        {/* Status Filter Select */}
+        <div className="flex items-center gap-2">
+          <Filter className="w-4 h-4 text-slate-400" />
+          <label htmlFor="mentor-submission-status" className="sr-only">
+            Filter submissions by status
+          </label>
+          <select
+            id="mentor-submission-status"
+            value={statusFilter}
+            onChange={(event) =>
+              handleStatusSelect(event.target.value as SubmissionStatus | "ALL")
+            }
+            className="input-design min-w-[170px] py-2 text-sm"
+          >
+            <option value="ALL">All Submissions</option>
+            <option value="Pending">Pending</option>
+            <option value="Approved">Approved</option>
+            <option value="Rejected">Rejected</option>
+          </select>
         </div>
       </div>
 
       {/* Submissions List */}
       <div className="space-y-4">
         {isLoading || isFetching ? (
-          <div className="space-y-3">
+          <div className="grid gap-4 lg:grid-cols-2">
             {[1, 2, 3].map((n) => (
               <div
                 key={n}
@@ -173,14 +173,14 @@ export default function MentorDashboard() {
             </p>
           </div>
         ) : (
-          <div className="grid gap-4">
+          <div className="grid gap-4 lg:grid-cols-2">
             {submissions.map((submission) => {
               const statusVariant =
                 submission.status === "Approved"
                   ? "approved"
                   : submission.status === "Rejected"
-                  ? "rejected"
-                  : "pending";
+                    ? "rejected"
+                    : "pending";
 
               return (
                 <div
@@ -200,10 +200,7 @@ export default function MentorDashboard() {
                     {submission.student && (
                       <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-medium">
                         <User className="w-3.5 h-3.5 text-slate-500" />
-                        <span>{submission.student.fullName}</span>
-                        <span className="text-slate-400">
-                          ({submission.student.email})
-                        </span>
+                        <span>{submission.student.fullName}</span>                        
                       </div>
                     )}
                   </div>

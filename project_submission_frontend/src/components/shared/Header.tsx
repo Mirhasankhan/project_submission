@@ -6,13 +6,26 @@ import { useProfileQuery } from "@/redux/features/auth/authApi";
 import { FolderGit2, ShieldCheck, GraduationCap } from "lucide-react";
 import SignOut from "./SignOut";
 import { Badge } from "@/components/ui/badge";
+import { useAppSelector } from "@/redux/hooks";
+import { useCurrentUser } from "@/redux/features/auth/authSlice";
 
 const Header = () => {
   const { data: profileResponse, isLoading } = useProfileQuery(undefined, {
     refetchOnMountOrArgChange: true,
   });
+  const currentUser = useAppSelector(useCurrentUser);
 
-  const user = profileResponse?.data;
+  const profileUser = profileResponse?.result || profileResponse?.data;
+  const user =
+    profileUser ||
+    (currentUser.token && currentUser.name
+      ? {
+          id: currentUser.id || "",
+          fullName: currentUser.name,
+          email: currentUser.email || "",
+          role: currentUser.role || "Student",
+        }
+      : null);
 
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-200">
@@ -38,7 +51,7 @@ const Header = () => {
 
           {/* User Profile Info & Sign Out */}
           <div className="flex items-center gap-3">
-            {isLoading ? (
+            {isLoading && !user ? (
               <div className="flex items-center gap-2.5 animate-pulse">
                 <div className="h-9 w-9 rounded-full bg-gray-200" />
                 <div className="hidden sm:block space-y-1.5">
@@ -49,9 +62,7 @@ const Header = () => {
             ) : user ? (
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border border-gray-100 bg-gray-50">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-xs flex items-center justify-center">
-                    {user.fullName ? user.fullName.charAt(0).toUpperCase() : "U"}
-                  </div>
+               
                   <div className="hidden sm:block text-left">
                     <div className="flex items-center gap-1.5">
                       <p className="text-xs font-semibold text-gray-900 leading-none">

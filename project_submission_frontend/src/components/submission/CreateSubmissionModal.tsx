@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { useSubmitProjectMutation } from "@/redux/features/submission/submissionApi";
 import { CreateSubmissionPayload } from "@/types";
 import { toast } from "react-toastify";
-import { Plus, FolderPlus, Github, Globe, FileText } from "lucide-react";
+import { Plus} from "lucide-react";
 
 export default function CreateSubmissionModal() {
   const [open, setOpen] = useState(false);
@@ -52,8 +52,7 @@ export default function CreateSubmissionModal() {
 
       <DialogContent className="sm:max-w-[550px] p-6 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center gap-2 text-primary">
-            <FolderPlus className="w-5 h-5" />
+          <div className="flex items-center gap-2 text-primary">        
             <DialogTitle className="text-xl">Submit New Project</DialogTitle>
           </div>
           <DialogDescription>
@@ -86,8 +85,7 @@ export default function CreateSubmissionModal() {
           </div>
 
           <div>
-            <label className="label-design flex items-center gap-1.5">
-              <Github className="w-3.5 h-3.5" />
+            <label className="label-design flex items-center gap-1.5">        
               <span>GitHub Repository URL</span>
               <span className="text-rose-500">*</span>
             </label>
@@ -126,8 +124,7 @@ export default function CreateSubmissionModal() {
           </div>
 
           <div>
-            <label className="label-design flex items-center gap-1.5">
-              <Globe className="w-3.5 h-3.5" />
+            <label className="label-design flex items-center gap-1.5">              
               <span>Live Deployment URL</span>
               <span className="text-rose-500">*</span>
             </label>
@@ -155,8 +152,7 @@ export default function CreateSubmissionModal() {
           </div>
 
           <div>
-            <label className="label-design flex items-center gap-1.5">
-              <FileText className="w-3.5 h-3.5" />
+            <label className="label-design flex items-center gap-1.5">           
               <span>Project Description</span>
               <span className="text-rose-500">*</span>
             </label>

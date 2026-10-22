@@ -5,6 +5,7 @@ import auth from "../../middlewares/auth";
 import { submissionController } from "./submission.controller";
 import { submissionValidation } from "./submission.validation";
 import { UserRole } from "@prisma/client";
+import rateLimiter from "../../middlewares/rateLimiter";
 
 const router = express.Router();
 
@@ -12,6 +13,7 @@ const router = express.Router();
 router.post(
   "/",
   auth(UserRole.Student),
+  rateLimiter(1, 3),
   validateRequest(submissionValidation.submissionSchema),
   submissionController.submitNewProject,
 );
@@ -33,6 +35,7 @@ router.get(
 router.patch(
   "/update-status",
   auth(UserRole.Mentor),
+  rateLimiter(1, 3),
   validateRequest(submissionValidation.approveRejectSchema),
   submissionController.approveRejectSubmission,
 );

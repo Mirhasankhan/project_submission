@@ -11,8 +11,15 @@ export function middleware(req: NextRequest) {
     pathname.startsWith("/auth/login/") ||
     pathname.startsWith("/auth/register/");
 
+  const isPublicRoute =
+    isAuthRoute ||
+    pathname === "/guidelines" ||
+    pathname.startsWith("/guidelines/") ||
+    pathname === "/showcase" ||
+    pathname.startsWith("/showcase/");
+
   // If user is not signed in and tries to access protected page
-  if (!token && !isAuthRoute) {
+  if (!token && !isPublicRoute) {
     const loginUrl = new URL("/auth/login", req.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);

@@ -51,7 +51,7 @@ export default function MentorDashboard() {
   } = useGetAllSubmissionsQuery(queryParams);
 
  
-  const submissionData = response?.result || response?.data;
+  const submissionData = response?.result;
   const submissions: SubmissionItem[] = submissionData?.submissions || [];
   const meta = submissionData?.meta;
 

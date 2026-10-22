@@ -43,9 +43,12 @@ export default function StudentDashboard() {
   const {
     data: response,
     isLoading,   
-  } = useGetMySubmissionsQuery(queryParams);
+  } = useGetMySubmissionsQuery(queryParams, {
+    refetchOnMountOrArgChange: true,
+  });
+  
 
-  const submissionData = response?.result || response?.data;
+  const submissionData = response?.result;
   const submissions: SubmissionItem[] = submissionData?.submissions || [];
   const meta = submissionData?.meta;
 

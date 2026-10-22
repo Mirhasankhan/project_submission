@@ -2,22 +2,20 @@
 
 import Container from "@/utils/Container";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useProfileQuery } from "@/redux/features/auth/authApi";
-import { FolderGit2, ShieldCheck, GraduationCap, LayoutDashboard, Trophy, BookOpen, LogIn } from "lucide-react";
+import { FolderGit2, ShieldCheck, GraduationCap, LogIn } from "lucide-react";
 import SignOut from "./SignOut";
 import { Badge } from "@/components/ui/badge";
 import { useAppSelector } from "@/redux/hooks";
 import { useCurrentUser } from "@/redux/features/auth/authSlice";
 
-const Header = () => {
-  const pathname = usePathname();
+const Header = () => { 
   const { data: profileResponse, isLoading } = useProfileQuery(undefined, {
     refetchOnMountOrArgChange: false,
   });
   const currentUser = useAppSelector(useCurrentUser);
 
-  const profileUser = profileResponse?.result || profileResponse?.data;
+  const profileUser = profileResponse?.result;
   const user =
     profileUser ||
     (currentUser.token && currentUser.name
@@ -29,12 +27,7 @@ const Header = () => {
         }
       : null);
 
-  const navLinks = [
-    { label: "Dashboard", href: "/", icon: LayoutDashboard },
-    { label: "Showcase", href: "/showcase", icon: Trophy },
-    { label: "Guidelines", href: "/guidelines", icon: BookOpen },
-  ];
-
+ 
   return (
     <header className="sticky top-0 z-30 bg-white/95 backdrop-blur border-b border-gray-200">
       <Container>
@@ -57,28 +50,7 @@ const Header = () => {
                 </span>
               </div>
             </Link>
-
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center gap-1">
-              {navLinks.map((link) => {
-                const Icon = link.icon;
-                const isActive = pathname === link.href;
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                      isActive
-                        ? "bg-primary/10 text-primary"
-                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
-                    }`}
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    <span>{link.label}</span>
-                  </Link>
-                );
-              })}
-            </nav>
+          
           </div>
 
           {/* User Profile Info & Sign Out or Sign In */}

@@ -5,6 +5,7 @@ import { useGetAllSubmissionsQuery } from "@/redux/features/submission/submissio
 import { SubmissionItem, SubmissionStatus } from "@/types";
 import StatsCards from "./StatsCards";
 import ApproveRejectModal from "./ApproveRejectModal";
+import CustomPagination from "@/components/shared/CustomPagination";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,8 +14,6 @@ import {
   ExternalLink,
   AlertCircle,
   Inbox,
-  ChevronLeft,
-  ChevronRight,
   Filter,
   CheckCircle2,
   XCircle,
@@ -29,7 +28,7 @@ export default function MentorDashboard() {
     "ALL",
   );
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = 6;
 
   // Selected submission for review modal
   const [selectedSubmission, setSelectedSubmission] =
@@ -56,10 +55,10 @@ export default function MentorDashboard() {
 
   const {
     data: response,
-    isLoading,
-    isFetching,
+    isLoading,  
   } = useGetAllSubmissionsQuery(queryParams);
 
+ 
   const submissionData = response?.result || response?.data;
   const submissions: SubmissionItem[] = submissionData?.submissions || [];
   const meta = submissionData?.meta;
@@ -88,15 +87,11 @@ export default function MentorDashboard() {
     <div className="space-y-6">
       {/* Title & Role Info */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-1">
-        <div>
-          <div className="flex items-center gap-2">
+        <div>         
             <h1 className="text-2xl font-bold tracking-tight text-slate-900">
               Mentor Review Dashboard
-            </h1>
-            <Badge variant="secondary" className="text-xs">
-              Mentor View
-            </Badge>
-          </div>
+            </h1>         
+         
           <p className="text-sm text-slate-500">
             Review student submissions, evaluate code repositories, and provide
             constructive feedback.
@@ -105,7 +100,7 @@ export default function MentorDashboard() {
       </div>
 
       {/* Stats Overview */}
-      <StatsCards meta={meta} onStatusSelect={handleStatusSelect} />
+      <StatsCards meta={meta} />
 
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
@@ -145,7 +140,7 @@ export default function MentorDashboard() {
 
       {/* Submissions List */}
       <div className="space-y-4">
-        {isLoading || isFetching ? (
+        {isLoading? (
           <div className="grid gap-4 lg:grid-cols-2">
             {[1, 2, 3].map((n) => (
               <div
@@ -295,34 +290,12 @@ export default function MentorDashboard() {
 
       {/* Pagination Controls */}
       {meta && meta.totalPage > 1 && (
-        <div className="flex items-center justify-between border-t border-slate-200 pt-4 bg-white px-4 py-3 rounded-xl shadow-sm">
-          <p className="text-xs text-slate-500">
-            Showing Page <span className="font-semibold">{meta.page}</span> of{" "}
-            <span className="font-semibold">{meta.totalPage}</span> (
-            {meta.total} total)
-          </p>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page <= 1}
-              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
-              className="gap-1 text-xs"
-            >
-              <ChevronLeft className="w-3.5 h-3.5" />
-              <span>Previous</span>
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={page >= meta.totalPage}
-              onClick={() => setPage((prev) => prev + 1)}
-              className="gap-1 text-xs"
-            >
-              <span>Next</span>
-              <ChevronRight className="w-3.5 h-3.5" />
-            </Button>
-          </div>
+        <div className="flex justify-end ">
+          <CustomPagination
+            page={page}
+            setPage={setPage}
+            totalPage={meta.totalPage}
+          />
         </div>
       )}
 

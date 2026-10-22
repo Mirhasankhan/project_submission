@@ -49,7 +49,7 @@ export interface SubmissionItem {
 export interface SubmissionPaginationMeta {
   page: number;
   limit: number;
-  total: number;
+  totalCount: number;
   totalPage: number;
   totalPending: number;
   totalApproved: number;

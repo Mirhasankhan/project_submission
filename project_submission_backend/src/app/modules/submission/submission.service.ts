@@ -77,14 +77,21 @@ const getAllSubmissions = async (query?: SubmissionQuery) => {
       studentId: true,
     });
 
-  const [submissions, pagination, totalPending, totalApproved, totalRejected] =
-    await Promise.all([
-      response.execute(),
-      response.countTotal(),
-      prisma.submission.count({ where: { status: "Pending" } }),
-      prisma.submission.count({ where: { status: "Approved" } }),
-      prisma.submission.count({ where: { status: "Rejected" } }),
-    ]);
+  const [
+    submissions,
+    pagination,
+    totalPending,
+    totalApproved,
+    totalRejected,
+    totalCount,
+  ] = await Promise.all([
+    response.execute(),
+    response.countTotal(),
+    prisma.submission.count({ where: { status: "Pending" } }),
+    prisma.submission.count({ where: { status: "Approved" } }),
+    prisma.submission.count({ where: { status: "Rejected" } }),
+    prisma.submission.count(),
+  ]);
 
   return {
     message: "Submissions retrieved successfully",
@@ -95,6 +102,7 @@ const getAllSubmissions = async (query?: SubmissionQuery) => {
         totalPending,
         totalApproved,
         totalRejected,
+        totalCount,
       },
     },
   };
@@ -122,14 +130,21 @@ const getStudentWiseSubmissions = async (
       studentId: true,
     });
 
-  const [submissions, pagination, totalPending, totalApproved, totalRejected] =
-    await Promise.all([
-      response.execute(),
-      response.countTotal(),
-      prisma.submission.count({ where: { status: "Pending", studentId } }),
-      prisma.submission.count({ where: { status: "Approved", studentId } }),
-      prisma.submission.count({ where: { status: "Rejected", studentId } }),
-    ]);
+  const [
+    submissions,
+    pagination,
+    totalPending,
+    totalApproved,
+    totalRejected,
+    totalCount,
+  ] = await Promise.all([
+    response.execute(),
+    response.countTotal(),
+    prisma.submission.count({ where: { status: "Pending", studentId } }),
+    prisma.submission.count({ where: { status: "Approved", studentId } }),
+    prisma.submission.count({ where: { status: "Rejected", studentId } }),
+    prisma.submission.count({ where: { studentId } }),
+  ]);
 
   return {
     message: "My Submissions retrieved successfully",
@@ -140,6 +155,7 @@ const getStudentWiseSubmissions = async (
         totalPending,
         totalApproved,
         totalRejected,
+        totalCount,
       },
     },
   };

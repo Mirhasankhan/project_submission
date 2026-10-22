@@ -1,18 +1,16 @@
 "use client";
 
-import { SubmissionPaginationMeta, SubmissionStatus } from "@/types";
+import { SubmissionPaginationMeta } from "@/types";
 import { FolderGit2, Clock, CheckCircle2, XCircle } from "lucide-react";
 
 interface StatsCardsProps {
   meta?: SubmissionPaginationMeta;
-  onStatusSelect: (status: SubmissionStatus | "ALL") => void;
 }
 
 export default function StatsCards({
   meta,
-  onStatusSelect,
 }: StatsCardsProps) {
-  const total = meta?.total ?? 0;
+  const total = meta?.totalCount ?? 0;
   const pending = meta?.totalPending ?? 0;
   const approved = meta?.totalApproved ?? 0;
   const rejected = meta?.totalRejected ?? 0;
@@ -21,7 +19,6 @@ export default function StatsCards({
     {
       label: "Total Submissions",
       count: total,
-      status: "ALL" as const,
       icon: FolderGit2,
       textColor: "text-slate-900",
       bgColor: "bg-slate-50",
@@ -31,7 +28,6 @@ export default function StatsCards({
     {
       label: "Pending Review",
       count: pending,
-      status: "Pending" as const,
       icon: Clock,
       textColor: "text-slate-900",
       bgColor: "bg-slate-50",
@@ -41,7 +37,6 @@ export default function StatsCards({
     {
       label: "Approved",
       count: approved,
-      status: "Approved" as const,
       icon: CheckCircle2,
       textColor: "text-slate-900",
       bgColor: "bg-slate-50",
@@ -51,7 +46,6 @@ export default function StatsCards({
     {
       label: "Rejected",
       count: rejected,
-      status: "Rejected" as const,
       icon: XCircle,
       textColor: "text-slate-900",
       bgColor: "bg-slate-50",
@@ -66,10 +60,8 @@ export default function StatsCards({
         const Icon = card.icon;
 
         return (
-          <button
+          <div
             key={card.label}
-            type="button"
-            onClick={() => onStatusSelect(card.status)}
             className={`text-left p-4 rounded-xl border ${card.borderColor} bg-white transition-shadow duration-200 hover:shadow-sm`}
           >
             <div className="flex items-center justify-between mb-2">
@@ -85,7 +77,7 @@ export default function StatsCards({
                 {card.count}
               </span>
             </div>
-          </button>
+          </div>
         );
       })}
     </div>

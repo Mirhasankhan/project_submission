@@ -3,7 +3,6 @@ import {
   ApiResponse,
   ApproveRejectPayload,
   CreateSubmissionPayload,
-  SubmissionItem,
   SubmissionQueryParams,
   SubmissionResponseData,
 } from "@/types";
@@ -46,14 +45,6 @@ export const submissionApi = baseApi.injectEndpoints({
       providesTags: ["Submissions"],
     }),
 
-    getSubmission: builder.query<ApiResponse<SubmissionItem>, string>({
-      query: (id) => ({
-        url: `/submission/${id}`,
-        method: "GET",
-      }),
-      providesTags: ["Submissions"],
-    }),
-
     approveRejectSubmission: builder.mutation<
       ApiResponse<null>,
       ApproveRejectPayload
@@ -72,6 +63,5 @@ export const {
   useSubmitProjectMutation,
   useGetMySubmissionsQuery,
   useGetAllSubmissionsQuery,
-  useGetSubmissionQuery,
   useApproveRejectSubmissionMutation,
 } = submissionApi;

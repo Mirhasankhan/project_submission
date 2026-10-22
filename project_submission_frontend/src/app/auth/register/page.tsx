@@ -12,7 +12,6 @@ export const dynamic = "force-static";
 export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      {/* Static SSG Shell: Prerendered at build time */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
@@ -27,7 +26,7 @@ export default function RegisterPage() {
         </p>
       </div>
 
-      {/* Client Island for Interactive Registration */}
+   
       <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-md px-4 sm:px-0">
         <RegisterForm />
       </div>

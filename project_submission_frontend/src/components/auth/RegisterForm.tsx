@@ -40,12 +40,11 @@ export default function RegisterForm() {
         );
 
         Cookies.set("token", authData.accessToken, { expires: 7 });
-        Cookies.set("accessToken", authData.accessToken, { expires: 7 });
 
         router.push("/");
       } else {
-        toast.success(response.message || "Registration successful! Please login.");
-        router.push("/auth/login");
+        toast.success(response.message || "Account created successfully!");
+        
       }
     } catch (err: any) {
       console.error(err);

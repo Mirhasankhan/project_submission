@@ -13,7 +13,6 @@ const SignOut = () => {
   const handleSignOut = () => {
     dispatch(logOut());
     Cookies.remove("token");
-    Cookies.remove("accessToken");
     router.push("/auth/login");
   };
 

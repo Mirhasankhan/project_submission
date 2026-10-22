@@ -44,7 +44,6 @@ function LoginFormInner() {
         );
 
         Cookies.set("token", authData.accessToken, { expires: 7 });
-        Cookies.set("accessToken", authData.accessToken, { expires: 7 });
 
         router.push(redirectPath);
       } else {

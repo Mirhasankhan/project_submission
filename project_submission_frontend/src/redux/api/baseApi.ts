@@ -9,9 +9,7 @@ export const baseApi = createApi({
     prepareHeaders: (headers, { getState }) => {
       const stateToken = (getState() as RootState)?.auth?.token;
       const cookieToken =
-        typeof window !== "undefined"
-          ? Cookies.get("token") || Cookies.get("accessToken")
-          : null;
+        typeof window !== "undefined" ? Cookies.get("token") : null;
 
       const token = stateToken || cookieToken;
 

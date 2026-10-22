@@ -11,7 +11,7 @@ export interface DecodedTokenPayload extends JwtPayload {
 
 export const JWTDecode = () => {
   if (typeof window !== "undefined") {
-    const token = Cookies.get("token") || Cookies.get("accessToken");
+    const token = Cookies.get("token");
     if (token) {
       try {
         const decoded = jwtDecode<DecodedTokenPayload>(token);

@@ -1,7 +1,6 @@
 "use client";
 
 import { SubmissionItem } from "@/types";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -102,12 +101,6 @@ export default function SubmissionCard({
             <ExternalLink className="w-3.5 h-3.5" />
             <span>Live Preview</span>
           </a>
-          <Link
-            href={`/submission/${submission.id}`}
-            className="inline-flex items-center gap-1 font-medium text-slate-600 hover:text-slate-900 transition-colors bg-slate-100 px-2.5 py-1.5 rounded-md"
-          >
-            <span>Review Page</span>
-          </Link>
           {isMentor && (
             <span className="text-slate-400 hidden sm:inline ml-2">
               Submitted: {dayjs(submission.createdAt).format("MMM D, YYYY")}

@@ -29,12 +29,12 @@ const submitNewProject = async (
     },
   });
 
-  // if (existingSubmission) {
-  //   throw new ApiError(
-  //     httpStatus.CONFLICT,
-  //     "A submission with this project name or repository already exists",
-  //   );
-  // }
+  if (existingSubmission) {
+    throw new ApiError(
+      httpStatus.CONFLICT,
+      "A submission with this project name or repository already exists",
+    );
+  }
 
   await prisma.submission.create({
     data: {
@@ -66,8 +66,7 @@ const getAllSubmissions = async (query?: SubmissionQuery) => {
       student: {
         select: {
           id: true,
-          fullName: true,
-          email: true,
+          fullName: true,         
         },
       },
     })
@@ -120,14 +119,14 @@ const getStudentWiseSubmissions = async (
       exacts: ["status"],
     })
     .rawFilter({
-      studentId,
+      studentId
     })
     .sortBy({ createdAt: "desc" })
     .paginate()
     .omit({
       updatedAt: true,
       normalizedRepo: true,
-      studentId: true,
+      studentId: true
     });
 
   const [
@@ -195,15 +194,9 @@ const approveRejectSubmission = async (payload: ApproveRejectPayload) => {
 
   return {
     message:
-      "Submission has been " +
-      (isApproved ? "approved" : "rejected") +
-      " successfully",
+      `Submission ${isApproved ? "approved" : "rejected"} successfully`,
   };
 };
-
-
-
-
 
 export const submissionService = {
   submitNewProject,

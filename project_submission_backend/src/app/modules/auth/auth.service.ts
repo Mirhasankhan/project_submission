@@ -51,7 +51,7 @@ const registerStudentIntoDB = async (payload: IRegisterPayload) => {
 };
 
 //login user
-const loginUserIntoDB = async (payload: ILoginPayload) => {
+const loginUser = async (payload: ILoginPayload) => {
   const user = await prisma.user.findUnique({
     where: {
       email: payload.email,
@@ -116,6 +116,6 @@ const getProfileFromDB = async (id: string) => {
 
 export const authService = {
   registerStudentIntoDB,
-  loginUserIntoDB,
+  loginUser,
   getProfileFromDB,
 };

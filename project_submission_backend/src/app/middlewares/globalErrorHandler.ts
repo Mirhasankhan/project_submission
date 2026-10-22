@@ -4,7 +4,6 @@ import httpStatus from "http-status";
 import { ZodError } from "zod";
 import config from "../../config";
 import { IGenericErrorMessage } from "../../interfaces/error";
-import handleValidationError from "../../errors/handleValidationError";
 import handleZodError from "../../errors/handleZodError";
 import handleClientError from "../../errors/handleClientError";
 import ApiError from "../../errors/ApiErrors";

@@ -59,12 +59,9 @@ const approveRejectSubmission = catchAsync(
   },
 );
 
-
-
 export const submissionController = {
   submitNewProject,
   getAllSubmissions,
   getStudentWiseSubmissions,
   approveRejectSubmission,
-
 };

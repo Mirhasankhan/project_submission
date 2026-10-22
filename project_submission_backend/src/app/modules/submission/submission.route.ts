@@ -9,7 +9,7 @@ import rateLimiter from "../../middlewares/rateLimiter";
 
 const router = express.Router();
 
-//submit new project
+
 router.post(
   "/",
   auth(UserRole.Student),
@@ -34,8 +34,7 @@ router.get(
 
 router.patch(
   "/update-status",
-  auth(UserRole.Mentor),
-  rateLimiter(1, 3),
+  auth(UserRole.Mentor),  
   validateRequest(submissionValidation.approveRejectSchema),
   submissionController.approveRejectSubmission,
 );

@@ -10,7 +10,7 @@ import Cookies from "js-cookie";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/features/auth/authSlice";
 
-export default function RegisterForm() {
+const RegisterForm = () => {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [registerUser, { isLoading }] = useRegisterMutation();
@@ -152,3 +152,5 @@ export default function RegisterForm() {
     </div>
   );
 }
+
+export default RegisterForm;

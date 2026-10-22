@@ -16,7 +16,7 @@ import { CreateSubmissionPayload } from "@/types";
 import { toast } from "react-toastify";
 import { Plus} from "lucide-react";
 
-export default function CreateSubmissionModal() {
+ const CreateSubmissionModal = () => {
   const [open, setOpen] = useState(false);
   const [submitProject, { isLoading }] = useSubmitProjectMutation();
 
@@ -75,7 +75,7 @@ export default function CreateSubmissionModal() {
                 },
               })}
               className="input-design"
-              placeholder="e.g. E-Commerce Platform"
+              placeholder="Enter your project name"
             />
             {errors.projectName && (
               <p className="text-red-500 text-xs mt-1">
@@ -114,7 +114,7 @@ export default function CreateSubmissionModal() {
                 },
               })}
               className="input-design"
-              placeholder="https://github.com/username/repository"
+              placeholder="Enter your GitHub repository URL"
             />
             {errors.repositoryUrl && (
               <p className="text-red-500 text-xs mt-1">
@@ -142,7 +142,7 @@ export default function CreateSubmissionModal() {
                 },
               })}
               className="input-design"
-              placeholder="https://your-project.vercel.app"
+              placeholder="Enter your live deployment URL"
             />
             {errors.liveUrl && (
               <p className="text-red-500 text-xs mt-1">
@@ -218,3 +218,5 @@ export default function CreateSubmissionModal() {
     </Dialog>
   );
 }
+
+export default CreateSubmissionModal;

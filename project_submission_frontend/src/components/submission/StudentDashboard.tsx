@@ -13,14 +13,14 @@ import {
   Filter,
 } from "lucide-react";
 
-export default function StudentDashboard() {
+const StudentDashboard = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<SubmissionStatus | "ALL">(
     "ALL",
   );
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const limit = 6;
 
   // Search input change with debounce timer
   const handleSearchChange = (value: string) => {
@@ -166,3 +166,5 @@ export default function StudentDashboard() {
     </div>
   );
 }
+
+export default StudentDashboard;

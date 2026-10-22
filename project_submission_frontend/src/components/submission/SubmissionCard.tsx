@@ -21,12 +21,12 @@ interface SubmissionCardProps {
   onReject?: (submission: SubmissionItem) => void;
 }
 
-export default function SubmissionCard({
+const SubmissionCard = ({
   submission,
   role,
   onApprove,
   onReject,
-}: SubmissionCardProps) {
+}: SubmissionCardProps) => {
   const isMentor = role === "mentor";
   const statusVariant =
     submission.status === "Approved"
@@ -139,3 +139,5 @@ export default function SubmissionCard({
     </div>
   );
 }
+
+export default SubmissionCard;

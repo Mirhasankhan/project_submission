@@ -13,7 +13,7 @@ import {
   Filter,
 } from "lucide-react";
 
-export default function MentorDashboard() {
+const MentorDashboard = () => {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<SubmissionStatus | "ALL">(
@@ -95,8 +95,7 @@ export default function MentorDashboard() {
       <StatsCards meta={meta} />
 
       {/* Filter and Search Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">
-        {/* Search Input using .input-design */}
+      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">     
         <div className="relative flex-1 max-w-md">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input
@@ -194,3 +193,5 @@ export default function MentorDashboard() {
     </div>
   );
 }
+
+export default MentorDashboard;

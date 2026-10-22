@@ -7,9 +7,7 @@ interface StatsCardsProps {
   meta?: SubmissionPaginationMeta;
 }
 
-export default function StatsCards({
-  meta,
-}: StatsCardsProps) {
+const StatsCards = ({ meta }: StatsCardsProps) => {
   const total = meta?.totalCount ?? 0;
   const pending = meta?.totalPending ?? 0;
   const approved = meta?.totalApproved ?? 0;
@@ -20,37 +18,22 @@ export default function StatsCards({
       label: "Total Submissions",
       count: total,
       icon: FolderGit2,
-      textColor: "text-slate-900",
-      bgColor: "bg-slate-50",
-      borderColor: "border-slate-200",
-      iconColor: "text-slate-600",
+     
     },
     {
       label: "Pending Review",
       count: pending,
-      icon: Clock,
-      textColor: "text-slate-900",
-      bgColor: "bg-slate-50",
-      borderColor: "border-slate-200",
-      iconColor: "text-slate-600",
+      icon: Clock,    
     },
     {
       label: "Approved",
       count: approved,
-      icon: CheckCircle2,
-      textColor: "text-slate-900",
-      bgColor: "bg-slate-50",
-      borderColor: "border-slate-200",
-      iconColor: "text-slate-600",
+      icon: CheckCircle2,    
     },
     {
       label: "Rejected",
       count: rejected,
-      icon: XCircle,
-      textColor: "text-slate-900",
-      bgColor: "bg-slate-50",
-      borderColor: "border-slate-200",
-      iconColor: "text-slate-600",
+      icon: XCircle,     
     },
   ];
 
@@ -62,18 +45,20 @@ export default function StatsCards({
         return (
           <div
             key={card.label}
-            className={`text-left p-4 rounded-xl border ${card.borderColor} bg-white transition-shadow duration-200 hover:shadow-sm`}
+            className={`text-left p-4 rounded-xl border border-slate-200 bg-white transition-shadow duration-200 hover:shadow-sm`}
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500 truncate">
                 {card.label}
               </span>
-              <div className={`p-1.5 rounded-lg ${card.bgColor}`}>
-                <Icon className={`w-4 h-4 ${card.iconColor}`} />
+              <div className={`p-1.5 rounded-lg bg-slate-50`}>
+                <Icon className={`w-4 h-4 text-slate-600`} />
               </div>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className={`text-2xl font-bold tracking-tight ${card.textColor}`}>
+              <span
+                className={`text-2xl font-bold tracking-tight text-slate-900`}
+              >
                 {card.count}
               </span>
             </div>
@@ -82,4 +67,5 @@ export default function StatsCards({
       })}
     </div>
   );
-}
+};
+export default StatsCards;

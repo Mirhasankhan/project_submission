@@ -65,14 +65,10 @@ function LoginFormInner() {
           <input
             type="email"
             {...register("email", {
-              required: "Email is required",
-              pattern: {
-                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: "Invalid email address",
-              },
+              required: "Email is required",            
             })}
             className="input-design"
-            placeholder="name@example.com"
+            placeholder="Enter your email"
             autoComplete="email"
           />
           {errors.email && (
@@ -88,7 +84,7 @@ function LoginFormInner() {
             type="password"
             {...register("password", { required: "Password is required" })}
             className="input-design"
-            placeholder="••••••••"
+            placeholder="enter your password"
             autoComplete="current-password"
           />
           {errors.password && (
@@ -150,7 +146,7 @@ function LoginFormInner() {
   );
 }
 
-export default function LoginForm() {
+const LoginForm = () => {
   return (
     <Suspense
       fallback={
@@ -163,3 +159,5 @@ export default function LoginForm() {
     </Suspense>
   );
 }
+
+export default LoginForm;

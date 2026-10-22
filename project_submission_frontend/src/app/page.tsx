@@ -7,7 +7,7 @@ import StudentDashboard from "@/components/submission/StudentDashboard";
 import MentorDashboard from "@/components/submission/MentorDashboard";
 import { useProfileQuery } from "@/redux/features/auth/authApi";
 
-export default function HomePage() {
+const HomePage = () => {
   const router = useRouter();
   const { data: profileResponse, isLoading, isError } = useProfileQuery();
   const user = profileResponse?.result || profileResponse?.data;
@@ -29,4 +29,6 @@ export default function HomePage() {
       </Container>
     </main>
   );
-}
+};
+
+export default HomePage;

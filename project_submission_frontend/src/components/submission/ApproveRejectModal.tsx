@@ -19,11 +19,11 @@ interface ApproveRejectModalProps {
   onClose: () => void;
 }
 
-export default function ApproveRejectModal({
+const ApproveRejectModal = ({
   submission,
   mode,
   onClose,
-}: ApproveRejectModalProps) {
+}: ApproveRejectModalProps) => {
   const [rejectReason, setRejectReason] = useState("");
   const [rejectReasonError, setRejectReasonError] = useState("");
   const [approveRejectSubmission, { isLoading }] =
@@ -104,7 +104,7 @@ export default function ApproveRejectModal({
             {rejectReasonError && (
               <p
                 id="rejection-reason-error"
-                className="text-xs text-rose-600"
+                className="text-xs pt-0 mt-0 text-rose-600"
               >
                 {rejectReasonError}
               </p>
@@ -130,26 +130,7 @@ export default function ApproveRejectModal({
             className="gap-2"
           >
             {isLoading ? (
-              <>
-                <svg
-                  className="animate-spin h-4 w-4 inline"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8v8H4z"
-                  />
-                </svg>
+              <>                
                 <span>Processing...</span>
               </>
             ) : isApprove ? (
@@ -163,3 +144,5 @@ export default function ApproveRejectModal({
     </Dialog>
   );
 }
+
+export default ApproveRejectModal;

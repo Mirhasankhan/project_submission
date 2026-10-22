@@ -1,5 +1,5 @@
 {
-  "name": "bobby-backend",
+  "name": "project-submission",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
@@ -15,7 +15,7 @@
   "keywords": [],
   "author": "Mir-Hasan",
   "license": "ISC",
-  "description": "bobby-backend",
+  "description": "project-submission for student and review by mentor",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",

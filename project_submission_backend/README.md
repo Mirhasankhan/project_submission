@@ -104,7 +104,8 @@ cp .env.example .env
 Open `.env` and fill in your PostgreSQL database credentials and JWT secrets:
 
 ```env
-DATABASE_URL="postgresql://username:password@localhost:5432/project_submission?schema=public"
+DATABASE_URL="postgresql://postgres.YOUR_PROJECT_REF:YOUR_PASSWORD@aws-0-REGION.pooler.supabase.com:6543/postgres?pgbouncer=true"
+DIRECT_URL="postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT_REF.supabase.co:5432/postgres?schema=public"
 PORT=4097
 BACKEND_BASE_URL="http://localhost:4097"
 DEFAULT_MENTOR_EMAIL=mentor@example.com
@@ -115,6 +116,33 @@ GEN_SALT=10
 EXPIRES_IN=90d
 REFRESH_TOKEN_PEPPER="your-refresh-token-pepper"
 ```
+
+### 3a. Configure Supabase Database URLs
+
+The backend uses Prisma with PostgreSQL. Supabase provides two connection URLs
+that should be configured separately:
+
+- `DATABASE_URL`: the pooled connection string used by the running application.
+- `DIRECT_URL`: the direct database connection string used by Prisma for schema
+  operations such as migrations and `db push`.
+
+To get these values:
+
+1. Create or open a project in the [Supabase Dashboard](https://supabase.com/dashboard).
+2. Open **Connect** and select the **ORMs** or **Connection string** view.
+3. Copy the pooled connection string into `DATABASE_URL` and the direct connection
+   string into `DIRECT_URL`.
+4. Replace the password placeholder with your database password if Supabase does
+   not include it in the copied URL.
+
+For a pooled Supabase URL, keep the parameters supplied by Supabase, including
+`pgbouncer=true` when it is present. The direct URL normally uses the
+`db.<project-ref>.supabase.co` host and port `5432`; do not use the pooler URL
+for `DIRECT_URL`. URL-encode special characters in the database password (for
+example, `@` becomes `%40`).
+
+Never commit `.env` or share either connection string publicly. The `.env.example`
+file contains placeholders only.
 
 ### 4. Push Database Schema & Generate Prisma Client
 
@@ -164,7 +192,8 @@ npm start
 
 | Variable | Required | Description | Default / Example |
 | :--- | :--- | :--- | :--- |
-| `DATABASE_URL` | **Yes** | PostgreSQL connection string | `postgresql://user:pass@localhost:5432/db` |
+| `DATABASE_URL` | **Yes** | Runtime PostgreSQL connection string. With Supabase, use the pooled connection URL from **Connect**. | `postgresql://...pooler.supabase.com:6543/postgres?pgbouncer=true` |
+| `DIRECT_URL` | **Yes** | Direct PostgreSQL connection used by Prisma for schema operations. With Supabase, use the direct URL from **Connect**, normally on port `5432`. | `postgresql://postgres:password@db.project-ref.supabase.co:5432/postgres` |
 | `PORT` | No | Port on which the API server runs | `4097` |
 | `BACKEND_BASE_URL` | No | Base public URL of backend | `http://localhost:4097` |
 | `DEFAULT_MENTOR_EMAIL` | **Yes** | Seeded mentor's email address | `mentor@example.com` |

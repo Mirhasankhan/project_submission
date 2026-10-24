@@ -7,6 +7,10 @@ export default {
   env: process.env.NODE_ENV,
   port: process.env.PORT,
   backend_base_url: process.env.BACKEND_BASE_URL,
+  cors_origins: (process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
   mentor_password: process.env.MENTOR_PASSWORD,
   default_mentor_email: process.env.DEFAULT_MENTOR_EMAIL,
   bcrypt_salt_rounds: process.env.BCRYPT_SALT_ROUNDS,

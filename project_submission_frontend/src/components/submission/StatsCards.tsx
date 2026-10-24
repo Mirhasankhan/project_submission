@@ -1,13 +1,20 @@
 "use client";
 
 import { SubmissionPaginationMeta } from "@/types";
-import { FolderGit2, Clock, CheckCircle2, XCircle } from "lucide-react";
+import {
+  FolderGit2,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  Ellipsis,
+} from "lucide-react";
 
 interface StatsCardsProps {
   meta?: SubmissionPaginationMeta;
+  isLoading?: boolean;
 }
 
-const StatsCards = ({ meta }: StatsCardsProps) => {
+const StatsCards = ({ meta, isLoading }: StatsCardsProps) => {
   const total = meta?.totalCount ?? 0;
   const pending = meta?.totalPending ?? 0;
   const approved = meta?.totalApproved ?? 0;
@@ -18,22 +25,21 @@ const StatsCards = ({ meta }: StatsCardsProps) => {
       label: "Total Submissions",
       count: total,
       icon: FolderGit2,
-     
     },
     {
       label: "Pending Review",
       count: pending,
-      icon: Clock,    
+      icon: Clock,
     },
     {
       label: "Approved",
       count: approved,
-      icon: CheckCircle2,    
+      icon: CheckCircle2,
     },
     {
       label: "Rejected",
       count: rejected,
-      icon: XCircle,     
+      icon: XCircle,
     },
   ];
 
@@ -49,7 +55,11 @@ const StatsCards = ({ meta }: StatsCardsProps) => {
           >
             <div className="flex items-center justify-between mb-2">
               <span className="text-xs font-medium text-slate-500 truncate">
-                {card.label}
+                {isLoading ? (
+                  <Ellipsis className="w-4 h-4 animate-pulse text-slate-300" />
+                ) : (
+                  <>{card.label}</>
+                )}
               </span>
               <div className={`p-1.5 rounded-lg bg-slate-50`}>
                 <Icon className={`w-4 h-4 text-slate-600`} />
@@ -59,7 +69,11 @@ const StatsCards = ({ meta }: StatsCardsProps) => {
               <span
                 className={`text-2xl font-bold tracking-tight text-slate-900`}
               >
-                {card.count}
+                {isLoading ? (
+                  <Ellipsis className="w-4 h-4 animate-pulse text-slate-300" />
+                ) : (
+                  <>{card.count}</>
+                )}
               </span>
             </div>
           </div>

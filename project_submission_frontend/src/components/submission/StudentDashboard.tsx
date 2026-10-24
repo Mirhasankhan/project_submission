@@ -73,7 +73,7 @@ const StudentDashboard = () => {
       </div>
 
       {/* Stats Overview */}
-      <StatsCards meta={meta} />
+      <StatsCards meta={meta} isLoading={isLoading} />
 
       {/* Filter and Search Bar */}
       <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-stretch md:items-center justify-between">

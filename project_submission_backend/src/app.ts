@@ -6,6 +6,7 @@ import router from "./app/routes";
 import GlobalErrorHandler from "./app/middlewares/globalErrorHandler";
 import { PrismaClient } from "@prisma/client";
 import path from "path";
+import config from "./config";
 
 const app: Application = express();
 const prisma = new PrismaClient();
@@ -22,7 +23,7 @@ const prisma = new PrismaClient();
 
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://127.0.0.1:3000"],
+    origin: config.cors_origins,
   }),
 );
 

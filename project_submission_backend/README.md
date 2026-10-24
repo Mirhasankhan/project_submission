@@ -108,6 +108,7 @@ DATABASE_URL="postgresql://postgres.YOUR_PROJECT_REF:YOUR_PASSWORD@aws-0-REGION.
 DIRECT_URL="postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT_REF.supabase.co:5432/postgres?schema=public"
 PORT=4097
 BACKEND_BASE_URL="http://localhost:4097"
+CORS_ORIGINS="http://localhost:3000,https://project-submission-frontend-roan.vercel.app"
 DEFAULT_MENTOR_EMAIL=mentor@example.com
 MENTOR_PASSWORD=SecurePassword123!
 BCRYPT_SALT_ROUNDS=12
@@ -196,6 +197,7 @@ npm start
 | `DIRECT_URL` | **Yes** | Direct PostgreSQL connection used by Prisma for schema operations. With Supabase, use the direct URL from **Connect**, normally on port `5432`. | `postgresql://postgres:password@db.project-ref.supabase.co:5432/postgres` |
 | `PORT` | No | Port on which the API server runs | `4097` |
 | `BACKEND_BASE_URL` | No | Base public URL of backend | `http://localhost:4097` |
+| `CORS_ORIGINS` | **Yes** | Comma-separated list of frontend origins allowed to access the API. Do not add trailing slashes. | `http://localhost:3000,https://project-submission-frontend-roan.vercel.app` |
 | `DEFAULT_MENTOR_EMAIL` | **Yes** | Seeded mentor's email address | `mentor@example.com` |
 | `MENTOR_PASSWORD` | **Yes** | Seeded mentor's initial password | `SecurePassword123!` |
 | `JWT_SECRET` | **Yes** | Secret key for signing JSON Web Tokens | `your-secret-key` |
